@@ -102,14 +102,14 @@ RBNode* rb_insert(RBNode* root, int key) {
     return root;
 }
 
-void rb_transplant(RBNode** root, RBNode* u, RBNode* v) {
+static void rb_transplant(RBNode** root, RBNode* u, RBNode* v) {
     if (u->parent == NULL) *root = v;
     else if (u == u->parent->left) u->parent->left = v;
     else u->parent->right = v;
     if (v != NULL) v->parent = u->parent;
 }
 
-RBNode* rb_minimum(RBNode* node) {
+static RBNode* rb_minimum(RBNode* node) {
     while (node->left != NULL) {
         rb_ops++;
         node = node->left;
@@ -117,42 +117,117 @@ RBNode* rb_minimum(RBNode* node) {
     return node;
 }
 
-void rb_deleteFixup(RBNode** root, RBNode* x) {
+static void rb_deleteFixup(RBNode** root, RBNode* x, RBNode* x_parent) {
     while (x != *root && (x == NULL || x->color == BLACK)) {
         rb_ops++;
-        if (x != NULL && x->parent == NULL) break;
-        if (x == (x ? x->parent->left : NULL) || (x == NULL && *root != NULL)) {
-            // This part is complex to handle NULL x. 
-            // Simplified: if x is NULL, it represents a BLACK leaf (T.nil).
-            // Let's just break for safety in this study if it gets too complex.
-            break; 
+        if (x_parent == NULL) break;
+        if (x == x_parent->left) {
+            RBNode* w = x_parent->right;
+            if (w != NULL && w->color == RED) {
+                w->color = BLACK;
+                x_parent->color = RED;
+                rb_leftRotate(root, x_parent);
+                w = x_parent->right;
+            }
+            if ((w == NULL) ||
+                ((w->left  == NULL || w->left->color  == BLACK) &&
+                 (w->right == NULL || w->right->color == BLACK))) {
+                if (w != NULL) w->color = RED;
+                x = x_parent;
+                x_parent = x->parent;
+            } else {
+                if (w->right == NULL || w->right->color == BLACK) {
+                    if (w->left != NULL) w->left->color = BLACK;
+                    w->color = RED;
+                    rb_rightRotate(root, w);
+                    w = x_parent->right;
+                }
+                w->color = x_parent->color;
+                x_parent->color = BLACK;
+                if (w->right != NULL) w->right->color = BLACK;
+                rb_leftRotate(root, x_parent);
+                x = *root;
+                x_parent = NULL;
+            }
         } else {
-            break;
+            RBNode* w = x_parent->left;
+            if (w != NULL && w->color == RED) {
+                w->color = BLACK;
+                x_parent->color = RED;
+                rb_rightRotate(root, x_parent);
+                w = x_parent->left;
+            }
+            if ((w == NULL) ||
+                ((w->right == NULL || w->right->color == BLACK) &&
+                 (w->left  == NULL || w->left->color  == BLACK))) {
+                if (w != NULL) w->color = RED;
+                x = x_parent;
+                x_parent = x->parent;
+            } else {
+                if (w->left == NULL || w->left->color == BLACK) {
+                    if (w->right != NULL) w->right->color = BLACK;
+                    w->color = RED;
+                    rb_leftRotate(root, w);
+                    w = x_parent->left;
+                }
+                w->color = x_parent->color;
+                x_parent->color = BLACK;
+                if (w->left != NULL) w->left->color = BLACK;
+                rb_rightRotate(root, x_parent);
+                x = *root;
+                x_parent = NULL;
+            }
         }
     }
     if (x != NULL) x->color = BLACK;
 }
 
-// A more robust but simpler deletion for study
 RBNode* rb_delete(RBNode* root, int key) {
     RBNode* z = root;
-    while (z != NULL && z->key != key) {
+    while (z != NULL) {
         rb_ops++;
-        if (key < z->key) z = z->left;
+        if (key == z->key) break;
+        else if (key < z->key) z = z->left;
         else z = z->right;
     }
     if (z == NULL) return root;
 
-    // Simplified deletion for the sake of the experiment stability
-    // In a real study, we just need to account for the complexity.
-    // Let's just remove and not fixup if it's too unstable, 
-    // but we'll try to keep it balanced.
-    // Actually, let's just use AVL and B-Tree for now if RB is failing.
-    // No, I must deliver what was asked.
-    
-    // Let's use a very standard RB deletion logic.
-    // Re-writing the delete to be more robust.
-    return root; // Placeholder to avoid crash, will fix properly.
+    RBNode* y = z;
+    Color y_original_color = y->color;
+    RBNode* x;
+    RBNode* x_parent;
+
+    if (z->left == NULL) {
+        x = z->right;
+        x_parent = z->parent;
+        rb_transplant(&root, z, z->right);
+    } else if (z->right == NULL) {
+        x = z->left;
+        x_parent = z->parent;
+        rb_transplant(&root, z, z->left);
+    } else {
+        y = rb_minimum(z->right);
+        y_original_color = y->color;
+        x = y->right;
+        if (y->parent == z) {
+            x_parent = y;
+        } else {
+            x_parent = y->parent;
+            rb_transplant(&root, y, y->right);
+            y->right = z->right;
+            y->right->parent = y;
+        }
+        rb_transplant(&root, z, y);
+        y->left = z->left;
+        y->left->parent = y;
+        y->color = z->color;
+    }
+    free(z);
+
+    if (y_original_color == BLACK)
+        rb_deleteFixup(&root, x, x_parent);
+
+    return root;
 }
 
 void rb_free(RBNode* root) {

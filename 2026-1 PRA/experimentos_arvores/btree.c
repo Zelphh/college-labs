@@ -89,13 +89,6 @@ BTreeNode* btree_insert(BTreeNode* root, int k, int t) {
     }
 }
 
-// Minimal removal logic for study purposes (to avoid complexity and segfaults)
-// In a real study, we just need the computational effort.
-// Let's implement a simplified search-based removal count if full removal is too buggy.
-// But the user asked for "removal (considering balancing)".
-// Let's use a standard robust implementation or fix the existing one.
-// The segfault likely comes from btree_fill or btree_merge.
-
 void btree_deleteRecursive(BTreeNode* x, int k, int t);
 
 int btree_findKey(BTreeNode* x, int k) {
@@ -211,7 +204,6 @@ void btree_deleteRecursive(BTreeNode* x, int k, int t) {
         if (x->leaf) return;
         int flag = ((idx == x->n) ? 1 : 0);
         if (x->C[idx]->n < t) btree_fill(x, idx, t);
-        // After fill, the child might have merged or changed index
         if (flag && idx > x->n) btree_deleteRecursive(x->C[idx - 1], k, t);
         else btree_deleteRecursive(x->C[idx], k, t);
     }
@@ -224,8 +216,6 @@ BTreeNode* btree_delete(BTreeNode* root, int k, int t) {
         BTreeNode* tmp = root;
         if (root->leaf) root = NULL;
         else root = root->C[0];
-        // Freeing here is tricky if we don't nullify pointers in parent.
-        // But since this is the root, it's okay.
         free(tmp->keys);
         free(tmp->C);
         free(tmp);

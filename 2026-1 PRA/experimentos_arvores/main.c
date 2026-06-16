@@ -23,7 +23,7 @@ int main() {
     
     printf("N,AVL_Add,AVL_Rem,RB_Add,RB_Rem,B1_Add,B1_Rem,B5_Add,B5_Rem,B10_Add,B10_Rem\n");
 
-    for (int n = STEP; n <= MAX_N; n += STEP) {
+    for (int n = 1; n <= MAX_N; n = (n < STEP ? STEP : n + STEP)) {
         double avl_add_avg = 0, avl_rem_avg = 0;
         double rb_add_avg = 0, rb_rem_avg = 0;
         double b1_add_avg = 0, b1_rem_avg = 0;
@@ -35,7 +35,6 @@ int main() {
             for (int i = 0; i < n; i++) keys[i] = i;
             shuffle(keys, n);
 
-            // AVL
             AVLNode* avl_root = NULL;
             avl_ops = 0;
             for (int i = 0; i < n; i++) avl_root = avl_insert(avl_root, keys[i]);
@@ -46,7 +45,6 @@ int main() {
             avl_rem_avg += (double)avl_ops / n;
             avl_free(avl_root);
 
-            // RB
             RBNode* rb_root = NULL;
             rb_ops = 0;
             for (int i = 0; i < n; i++) rb_root = rb_insert(rb_root, keys[i]);
@@ -57,8 +55,7 @@ int main() {
             rb_rem_avg += (double)rb_ops / n;
             rb_free(rb_root);
 
-            // B-Trees
-            int t_vals[] = {2, 5, 10}; // t=2 is min for order 4
+            int t_vals[] = {2, 5, 10};
             double *b_add_avgs[] = {&b1_add_avg, &b5_add_avg, &b10_add_avg};
             double *b_rem_avgs[] = {&b1_rem_avg, &b5_rem_avg, &b10_rem_avg};
 

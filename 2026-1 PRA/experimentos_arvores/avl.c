@@ -23,7 +23,7 @@ AVLNode* newNode(int key) {
 }
 
 AVLNode *rightRotate(AVLNode *y) {
-    avl_ops++; // Rotação
+    avl_ops++;
     AVLNode *x = y->left;
     AVLNode *T2 = x->right;
     x->right = y;
@@ -34,7 +34,7 @@ AVLNode *rightRotate(AVLNode *y) {
 }
 
 AVLNode *leftRotate(AVLNode *x) {
-    avl_ops++; // Rotação
+    avl_ops++;
     AVLNode *y = x->right;
     AVLNode *T2 = y->left;
     y->left = x;
@@ -50,7 +50,7 @@ int getBalance(AVLNode *N) {
 }
 
 AVLNode* avl_insert(AVLNode* node, int key) {
-    avl_ops++; // Comparação/Visita
+    avl_ops++;
     if (node == NULL) return newNode(key);
 
     if (key < node->key)
