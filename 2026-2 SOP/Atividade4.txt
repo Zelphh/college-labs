@@ -1,0 +1,30 @@
+[zelph@zelph ~]$ ls
+ Aplicativos   'Área de trabalho'   comandos_shell_Matheus   Documents   ETI.md    Modelos   Projetos   Vídeos
+ Applications   cardLegal.html      Documentos               Downloads   Imagens   Músicas   Público    workspace
+[zelph@zelph ~]$
+[zelph@zelph ~]$ cd Área\ de\ trabalho/
+[zelph@zelph Área de trabalho]$ mkdir UDESC
+[zelph@zelph Área de trabalho]$ cd UDESC
+[zelph@zelph UDESC]$ mkdir SOP
+[zelph@zelph UDESC]$ mkdir LINUX
+[zelph@zelph UDESC]$ touch teste.txt
+[zelph@zelph UDESC]$ echo "este é um arquivo teste criado pelo shell." > teste.txt
+[zelph@zelph UDESC]$ cat teste.txt
+este é um arquivo teste criado pelo shell.
+[zelph@zelph UDESC]$ cp teste.txt LINUX/
+[zelph@zelph UDESC]$ mv teste.txt SOP/
+[zelph@zelph UDESC]$ ls
+LINUX  SOP
+[zelph@zelph UDESC]$ rm SOP/teste.txt
+[zelph@zelph UDESC]$ mv SOP/ sistemas_operacionais
+[zelph@zelph UDESC]$ touch .oculto
+[zelph@zelph UDESC]$ ls -la
+total 16
+drwxr-xr-x 4 zelph zelph 4096 set  2 20:34 .
+drwxr-xr-x 3 zelph zelph 4096 set  2 20:31 ..
+drwxr-xr-x 2 zelph zelph 4096 set  2 20:32 LINUX
+-rw-r--r-- 1 zelph zelph    0 set  2 20:34 .oculto
+drwxr-xr-x 2 zelph zelph 4096 set  2 20:33 sistemas_operacionais
+[zelph@zelph UDESC]$ cd ~
+[zelph@zelph ~]$
+
